@@ -1,2 +1,7 @@
 
 mqtt.log
+.idea/misc.xml
+.idea/modules.xml
+.idea/MQTT_logger.iml
+.idea/vcs.xml
+.idea/workspace.xml

@@ -7,6 +7,7 @@ import base64
 import json
 import logging
 
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
@@ -37,19 +38,10 @@ def on_connect(mqttc, mosq, obj,rc):
 def on_message(mqttc,obj,msg):
     try:
         #print(msg.payload)
+
         logging.info(msg.payload)
         x = json.loads(msg.payload.decode('utf-8'))
-        device = x["dev_id"]
-        counter = x["counter"]
-        payload_raw = x["payload_raw"]
-        payload_fields = x["payload_fields"]
-        datetime = x["metadata"]["time"]
-        gateways = x["metadata"]["gateways"]
-        # print for every gateway that has received the message and extract RSSI
-        for gw in gateways:
-            gateway_id = gw["gtw_id"]
-            rssi = gw["rssi"]
-            #print(datetime + ", " + device + ", " + str(counter) + ", "+ gateway_id + ", "+ str(rssi) + ", " + str(payload_fields))
+
     except Exception as e:
         print(e)
         pass
@@ -62,12 +54,17 @@ def on_subscribe(mosq, obj, mid, granted_qos):
 
 def on_log(mqttc,obj,level,buf):
     print("message:" + str(buf))
-    print("userdata:" + str(obj))
+    #print("userdata:" + str(obj))
 
 mqttc= mqtt.Client()
 # Assign event callbacks
 mqttc.on_connect=on_connect
 mqttc.on_message=on_message
+mqttc.on_subscribe=on_subscribe
+mqttc.on_log = on_log
+mqttc.on_publish = on_publish
+
+
 mqttc.enable_logger(logger=None)
 mqttc.reconnect_delay_set(min_delay=1, max_delay=120)
 
