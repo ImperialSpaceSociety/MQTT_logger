@@ -37,8 +37,6 @@ def on_connect(mqttc, mosq, obj,rc):
 # gives message from device
 def on_message(mqttc,obj,msg):
     try:
-        #print(msg.payload)
-
         logging.info(msg.payload)
         x = json.loads(msg.payload.decode('utf-8'))
 
@@ -61,11 +59,11 @@ mqttc= mqtt.Client()
 mqttc.on_connect=on_connect
 mqttc.on_message=on_message
 mqttc.on_subscribe=on_subscribe
-mqttc.on_log = on_log
+#mqttc.on_log = on_log
 mqttc.on_publish = on_publish
 
 
-mqttc.enable_logger(logger=None)
+#mqttc.enable_logger(logger=None)
 mqttc.reconnect_delay_set(min_delay=1, max_delay=120)
 
 
