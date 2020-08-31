@@ -11,26 +11,29 @@
 ########################################################################################################################
 
 
-import json
 import logging
+import sys
 from threading import Thread
 
-import paho.mqtt.client as  mqtt
+import paho.mqtt.client as mqtt
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(message)s",
-    handlers=[
-        logging.FileHandler("mqtt.log"),
-        logging.StreamHandler()
-    ]
-)
+logger = logging.getLogger('')
+logger.setLevel(logging.INFO)
+fh = logging.FileHandler('mqtt.log')
+sh = logging.StreamHandler(sys.stdout)
+formatter = logging.Formatter('[%(asctime)s] %(levelname)s [%(filename)s.%(funcName)s:%(lineno)d] %(message)s',
+                              datefmt='%a, %d %b %Y %H:%M:%S')
+fh.setFormatter(formatter)
+sh.setFormatter(formatter)
+logger.addHandler(fh)
+logger.addHandler(sh)
+
 # APPEUI = "70B3D57EF00069A3"
 APPID = "icss_lora_tracker"
 PSW = 'ttn-account-v2.vlMjFic1AU9Dr-bAI18X6kzc5lSJGbFoeLbbASramBg'
 
 
-class ThreadedServer(Thread):
+class ThreadedMQTTLogger(Thread):
     def __init__(self):
 
         self.mqttc = mqtt.Client()
@@ -48,6 +51,8 @@ class ThreadedServer(Thread):
         self.mqttc.connect("eu.thethings.network", 1883, 60)
 
         Thread.__init__(self)
+        logging.info("Running MQTT Logger")
+
 
     # run by the Thread object
     def run(self):
@@ -58,7 +63,8 @@ class ThreadedServer(Thread):
 
     # gives connection message
     def on_connect(self, mqttc, mosq, obj, rc):
-        print("Connected with result code:" + str(rc))
+        logging.debug("Connected with result code:" + str(rc))
+
         if rc == 0:
             # subscribe for all devices of user
             res_1 = mqttc.subscribe('+/devices/+/up')
@@ -71,27 +77,18 @@ class ThreadedServer(Thread):
     def on_message(self, mqttc, obj, msg):
         try:
             logging.info(msg.payload)
-            x = json.loads(msg.payload.decode('utf-8'))
-
         except Exception as e:
-            print(e)
-            pass
+            logging.critical(e, exc_info=True)  # log exception info at CRITICAL log level
 
     def on_publish(self, mosq, obj, mid):
-        print("mid: " + str(mid))
+        logging.debug("mid: " + str(mid))
 
     def on_subscribe(self, mosq, obj, mid, granted_qos):
-        print("Subscribed: " + str(mid) + " " + str(granted_qos))
+        logging.debug("Subscribed: " + str(mid) + " " + str(granted_qos))
 
     def on_log(self, mqttc, obj, level, buf):
-        print("message:" + str(buf))
-        # print("userdata:" + str(obj))
-
-
-def some_callback(client, address, data):
-    print('data received', data.strip("\n"), flush=True)
-    # send a response back to the client
+        logging.debug("message:" + str(buf))
 
 
 if __name__ == "__main__":
-    ThreadedServer().start()
+    ThreadedMQTTLogger().start()
