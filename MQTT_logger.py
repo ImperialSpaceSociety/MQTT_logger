@@ -53,7 +53,6 @@ class ThreadedMQTTLogger(Thread):
         Thread.__init__(self)
         logging.info("Running MQTT Logger")
 
-
     # run by the Thread object
     def run(self):
         # and listen to server
