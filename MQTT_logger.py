@@ -21,7 +21,7 @@ logger = logging.getLogger('')
 logger.setLevel(logging.INFO)
 fh = logging.FileHandler('mqtt.log')
 sh = logging.StreamHandler(sys.stdout)
-formatter = logging.Formatter('[%(asctime)s] %(levelname)s [%(filename)s.%(funcName)s:%(lineno)d] %(message)s',
+formatter = logging.Formatter('[%(asctime)s] %(levelname)s %(message)s',
                               datefmt='%a, %d %b %Y %H:%M:%S')
 fh.setFormatter(formatter)
 sh.setFormatter(formatter)
