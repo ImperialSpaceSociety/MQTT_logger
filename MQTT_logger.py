@@ -91,7 +91,6 @@ class ThreadedMQTTLogger(Thread):
         if rc != 0:
             if self.__reconnect:
                 self.mqttc.reconnect()
-                self.start()
             else:
                 logging.error("unexpected disconnection")
 
