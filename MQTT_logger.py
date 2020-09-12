@@ -28,13 +28,9 @@ sh.setFormatter(formatter)
 logger.addHandler(fh)
 logger.addHandler(sh)
 
-# APPEUI = "70B3D57EF00069A3"
-APPID = "icss_lora_tracker"
-PSW = 'ttn-account-v2.vlMjFic1AU9Dr-bAI18X6kzc5lSJGbFoeLbbASramBg'
-
 
 class ThreadedMQTTLogger(Thread):
-    def __init__(self):
+    def __init__(self, APPID, PSW):
 
         self.mqttc = mqtt.Client()
         # Assign event callbacks
@@ -90,4 +86,6 @@ class ThreadedMQTTLogger(Thread):
 
 
 if __name__ == "__main__":
-    ThreadedMQTTLogger().start()
+    APPID = "ttn-arduino-tracker-swallow"
+    PSW = 'ttn-account-v2.7vGShHqn7zRExYPYGF9bB6QJ2wj6kT7YIyVMYd3nIKM'
+    ThreadedMQTTLogger(APPID, PSW).start()
