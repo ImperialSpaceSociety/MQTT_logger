@@ -39,6 +39,9 @@ class ThreadedMQTTLogger(Thread):
         self.mqttc.on_subscribe = self.on_subscribe
         self.mqttc.on_log = self.on_log
         self.mqttc.on_publish = self.on_publish
+        self.mqttc.on_disconnect = self.on_disconnect
+
+        self.__reconnect = True
 
         # mqttc.enable_logger(logger=None)
         self.mqttc.reconnect_delay_set(min_delay=1, max_delay=120)
@@ -83,6 +86,14 @@ class ThreadedMQTTLogger(Thread):
 
     def on_log(self, mqttc, obj, level, buf):
         logging.debug("message:" + str(buf))
+
+    def on_disconnect(self, client, userdata, rc):
+        if rc != 0:
+            if self.__reconnect:
+                self.mqttc.reconnect()
+                self.start()
+            else:
+                logging.error("unexpected disconnection")
 
 
 if __name__ == "__main__":
