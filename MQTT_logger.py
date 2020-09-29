@@ -96,6 +96,6 @@ class ThreadedMQTTLogger(Thread):
 
 
 if __name__ == "__main__":
-    APPID = "ttn-arduino-tracker-swallow"
-    PSW = 'ttn-account-v2.7vGShHqn7zRExYPYGF9bB6QJ2wj6kT7YIyVMYd3nIKM'
+    APPID = "icss_lora_tracker"
+    PSW = 'ttn-account-v2.vlMjFic1AU9Dr-bAI18X6kzc5lSJGbFoeLbbASramBg'
     ThreadedMQTTLogger(APPID, PSW).start()
