@@ -18,7 +18,7 @@ from threading import Thread
 import paho.mqtt.client as mqtt
 
 logger = logging.getLogger('')
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.DEBUG)
 fh = logging.FileHandler('mqtt.log')
 sh = logging.StreamHandler(sys.stdout)
 formatter = logging.Formatter('[%(asctime)s] %(levelname)s %(message)s',
@@ -54,6 +54,8 @@ class ThreadedMQTTLogger(Thread):
 
     # run by the Thread object
     def run(self):
+        logging.info("Starting MQTT logger thread")
+
         # and listen to server
         run = True
         while run:
@@ -98,4 +100,6 @@ class ThreadedMQTTLogger(Thread):
 if __name__ == "__main__":
     APPID = "icss_lora_tracker"
     PSW = 'ttn-account-v2.vlMjFic1AU9Dr-bAI18X6kzc5lSJGbFoeLbbASramBg'
-    ThreadedMQTTLogger(APPID, PSW).start()
+    mqttlogger = ThreadedMQTTLogger(APPID, PSW)
+    mqttlogger.start()
+
