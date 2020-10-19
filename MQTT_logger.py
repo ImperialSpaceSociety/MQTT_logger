@@ -19,7 +19,7 @@ import paho.mqtt.client as mqtt
 
 logger = logging.getLogger('')
 logger.setLevel(logging.DEBUG)
-fh = logging.FileHandler('mqtt.log')
+fh = logging.FileHandler('mqtt.txt')
 sh = logging.StreamHandler(sys.stdout)
 formatter = logging.Formatter('[%(asctime)s] %(levelname)s %(message)s',
                               datefmt='%a, %d %b %Y %H:%M:%S')
