@@ -106,8 +106,13 @@ class ThreadedMQTTLogger(Thread):
                 logging.error("unexpected disconnection")
 
     def save_prediction(self, incoming_pkt: str):
+        """
+        Save a flight prediction from the exact point the balloon was last seen
+        :param incoming_pkt:
+        :return: None
+        """
         # parse packet
-        parsed_pkt = PacketParser(incoming_pkt)
+        parsed_pkt = PacketParser(incoming_pkt) # TODO: figure out how to fake the parsed packet with current time.
         # request prediction of flight
         prediction = self.predictapiclient.make_request(parsed_pkt.current_time,
                                                         180,
