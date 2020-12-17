@@ -13,22 +13,30 @@ class Test_Scorer(TestCase):
 
     def test_if_current_long_is_parsed_correctly(self):
         pac = PacketParser(raw_packet=self.raw_mqtt_packet)
+        pac.parse_packet()
+
         self.assertAlmostEqual(1.350021004, pac.current_long, delta=0.00001)
 
     def test_if_current_lat_is_parsed_correctly(self):
         pac = PacketParser(raw_packet=self.raw_mqtt_packet)
+        pac.parse_packet()
+
         self.assertAlmostEqual(51.96269989, pac.current_lat, delta=0.00001)
 
     def test_if_current_alt_is_parsed_correctly(self):
         pac = PacketParser(raw_packet=self.raw_mqtt_packet)
+        pac.parse_packet()
+
         self.assertAlmostEqual(83, pac.current_alt, delta=0.00001)
 
     def test_if_current_time_is_parsed_correctly(self):
         pac = PacketParser(raw_packet=self.raw_mqtt_packet)
+        pac.parse_packet()
         target_time = datetime(2020, 12, 15, 13, 32, 30)
 
         self.assertAlmostEqual(target_time, pac.current_time, delta=timedelta(seconds=1))
 
     def test_if_can_parse_junk_packet(self):
         pac = PacketParser(raw_packet=self.junk_mqtt_packet)
-        self.assertEqual(False, pac.parse_success)
+
+        self.assertRaises(ValueError,pac.parse_packet)

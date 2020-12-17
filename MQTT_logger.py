@@ -114,7 +114,9 @@ class ThreadedMQTTLogger(Thread):
         # parse packet
         parsed_pkt = PacketParser(incoming_pkt) # TODO: figure out how to fake the parsed packet with current time.
 
-        if not parsed_pkt.parse_success:
+        try:
+            parsed_pkt.parse_packet()
+        except ValueError:
             return
 
         # request prediction of flight
