@@ -6,3 +6,4 @@ mqtt.log
 .idea/vcs.xml
 .idea/workspace.xml
 test/datadump/*
+test/mqtt.txt
