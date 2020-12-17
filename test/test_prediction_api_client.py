@@ -2,8 +2,6 @@ from unittest import TestCase
 import unittest
 from prediction_api_client import PredictApiClient
 from datetime import datetime
-from operator import getitem
-import json
 
 target_url = "http://predict.cusf.co.uk/api/v1/?launch_latitude=52&launch_longitude=0&launch_altitude=11999&launch_datetime=2020-12-17T11%3A30%3A00%2B00%3A00&ascent_rate=0.8&float_altitude=12000&stop_datetime=2020-12-20T11%3A30%3A00%2B00%3A00&profile=float_profile"
 
