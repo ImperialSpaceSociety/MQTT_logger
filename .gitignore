@@ -5,3 +5,4 @@ mqtt.log
 .idea/MQTT_logger.iml
 .idea/vcs.xml
 .idea/workspace.xml
+test/datadump/test.json

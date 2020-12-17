@@ -1,15 +1,22 @@
+import pathlib as pl
 from unittest import TestCase
 
 from file_saver import FileSaver
 
 
+class TestCaseBase(TestCase):
+    def assertIsFile(self, path):
+        if not pl.Path(path).resolve().is_file():
+            raise AssertionError("File does not exist: %s" % str(path))
 
-class Test_Scorer(TestCase):
 
+class ActualTest(TestCaseBase):
     def test_file_saving(self):
         Fs = FileSaver()
-        res = Fs.save_file("test.json",b"abc")
-        self.assertEqual(target_url, res.url)
+        res = Fs.save_file("test.json", b"abc")
+
+        path = pl.Path("datadump/test.json")
+        self.assertIsFile(path)
 
 
 if __name__ == '__main__':
