@@ -13,9 +13,14 @@
 
 import logging
 import sys
+from datetime import datetime
 from threading import Thread
 
 import paho.mqtt.client as mqtt
+
+from file_saver import FileSaver
+from packet_parser import PacketParser
+from prediction_api_client import PredictApiClient
 
 logger = logging.getLogger('')
 logger.setLevel(logging.DEBUG)
@@ -31,6 +36,8 @@ logger.addHandler(sh)
 
 class ThreadedMQTTLogger(Thread):
     def __init__(self, APPID, PSW):
+        self.predictapiclient = PredictApiClient()
+        self.filesaver = FileSaver()
 
         self.mqttc = mqtt.Client()
         # Assign event callbacks
@@ -77,6 +84,8 @@ class ThreadedMQTTLogger(Thread):
     def on_message(self, mqttc, obj, msg):
         try:
             logging.info(msg.payload)
+            self.save_prediction(msg.payload)
+
         except Exception as e:
             logging.critical(e, exc_info=True)  # log exception info at CRITICAL log level
 
@@ -96,10 +105,23 @@ class ThreadedMQTTLogger(Thread):
             else:
                 logging.error("unexpected disconnection")
 
+    def save_prediction(self, incoming_pkt: str):
+        # parse packet
+        parsed_pkt = PacketParser(incoming_pkt)
+        # request prediction of flight
+        prediction = self.predictapiclient.make_request(parsed_pkt.current_time,
+                                                        180,
+                                                        parsed_pkt.current_alt,
+                                                        parsed_pkt.current_long,
+                                                        parsed_pkt.current_lat)
+        # save prediction to file.
+        file_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        file_name = 'prediction_at_{0}.json'.format(file_time)
+        self.filesaver.save_file(file_name, prediction.content)
+
 
 if __name__ == "__main__":
     APPID = "icss_lora_tracker"
     PSW = 'ttn-account-v2.vlMjFic1AU9Dr-bAI18X6kzc5lSJGbFoeLbbASramBg'
     mqttlogger = ThreadedMQTTLogger(APPID, PSW)
     mqttlogger.start()
-
