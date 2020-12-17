@@ -113,6 +113,10 @@ class ThreadedMQTTLogger(Thread):
         """
         # parse packet
         parsed_pkt = PacketParser(incoming_pkt) # TODO: figure out how to fake the parsed packet with current time.
+
+        if not parsed_pkt.parse_success:
+            return
+
         # request prediction of flight
         prediction = self.predictapiclient.make_request(parsed_pkt.current_time,
                                                         180,
