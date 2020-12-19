@@ -11,6 +11,7 @@ import schedule
 from bisect import bisect_left, bisect_right
 from logger import init_logging
 from make_predictions_and_save import PredictionManager
+import logging
 init_logging()
 
 
@@ -24,6 +25,7 @@ class PredictionSaver:
         self.predictapiclient = PredictApiClient()
         self.filesaver = FileSaver()
         self.pm = PredictionManager()
+        logging.debug("Initialised periodic prediction saver")
 
     @staticmethod
     def extract_datetimes(string):
@@ -67,6 +69,7 @@ class PredictionSaver:
         current_time = pd.Timestamp.now()
         latest_prediction_file = self.get_latest_prediction_json_file()
         long,lat,alt = self.get_predicted_position_from_prediction_file_at_specified_timestamp(latest_prediction_file,current_time)
+        logging.debug("Balloon expected to be long={0} lat={1} alt={2} now".format(long,lat,alt))
 
         self.pm.predict_and_save(datetime.now(),alt,long,lat,"forward_prediction_at")
 
@@ -78,6 +81,7 @@ if __name__ == "__main__":
 
 
     schedule.every().hour.at("00:00").do(ps.save_prediction_on_past_prediction)
+    logging.info("scheduling jobs for periodic running of predictions")
 
     while True:
         schedule.run_pending()
