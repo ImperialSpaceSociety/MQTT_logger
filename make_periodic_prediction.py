@@ -34,8 +34,12 @@ class PredictionSaver:
 
         return target_time
 
-    def get_latest_prediction_json_file(self):
-        p = Path(r'datadump/')
+    def get_latest_prediction_json_file(self, p):
+        """
+        Search the supplied directory p for the most recent prediction json
+        :param p: Pathlib object of directory to search
+        :return: Pathlib object of more recent prediction json file.
+        """
         onlyfiles = p.rglob('*')
 
         sortedFiles = sorted(onlyfiles, key=lambda x: self.extract_datetimes(str(x)))
@@ -67,7 +71,9 @@ class PredictionSaver:
         """
 
         current_time = pd.Timestamp.now()
-        latest_prediction_file = self.get_latest_prediction_json_file()
+        p = Path(r'datadump/')
+
+        latest_prediction_file = self.get_latest_prediction_json_file(p)
         long,lat,alt = self.get_predicted_position_from_prediction_file_at_specified_timestamp(latest_prediction_file,current_time)
         logging.debug("Balloon expected to be long={0} lat={1} alt={2} now".format(long,lat,alt))
 
