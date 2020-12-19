@@ -77,11 +77,16 @@ class PredictionSaver:
 if __name__ == "__main__":
 
     ps = PredictionSaver()
-    ps.save_prediction_on_past_prediction()
-
-
-    schedule.every().hour.at("00:00").do(ps.save_prediction_on_past_prediction)
     logging.info("scheduling jobs for periodic running of predictions")
+    #ps.save_prediction_on_past_prediction()
+
+    job = ps.save_prediction_on_past_prediction
+    schedule.every().day.at("00:00").do(job)
+    schedule.every().day.at("04:00").do(job)
+    schedule.every().day.at("08:00").do(job)
+    schedule.every().day.at("12:00").do(job)
+    schedule.every().day.at("16:00").do(job)
+    schedule.every().day.at("20:00").do(job)
 
     while True:
         schedule.run_pending()
