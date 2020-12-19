@@ -9,10 +9,9 @@
 #
 # threaded example credit; https://forum.derivative.ca/t/python-threaded-tcp-socket-server-example/12002/5
 ########################################################################################################################
-
-
 import logging
-import sys
+from logger import init_logging
+
 from datetime import datetime
 from threading import Thread
 
@@ -22,16 +21,7 @@ from file_saver import FileSaver
 from packet_parser import PacketParser
 from prediction_api_client import PredictApiClient
 
-logger = logging.getLogger('')
-logger.setLevel(logging.DEBUG)
-fh = logging.FileHandler('mqtt.txt')
-sh = logging.StreamHandler(sys.stdout)
-formatter = logging.Formatter('[%(asctime)s] %(levelname)s %(message)s',
-                              datefmt='%a, %d %b %Y %H:%M:%S')
-fh.setFormatter(formatter)
-sh.setFormatter(formatter)
-logger.addHandler(fh)
-logger.addHandler(sh)
+init_logging()
 
 
 class ThreadedMQTTLogger(Thread):
