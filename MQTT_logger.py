@@ -17,17 +17,16 @@ from threading import Thread
 
 import paho.mqtt.client as mqtt
 
-from file_saver import FileSaver
 from packet_parser import PacketParser
-from prediction_api_client import PredictApiClient
+from make_predictions_and_save import PredictionManager
+
 
 init_logging()
 
 
 class ThreadedMQTTLogger(Thread):
     def __init__(self, APPID, PSW):
-        self.predictapiclient = PredictApiClient()
-        self.filesaver = FileSaver()
+        self.pm = PredictionManager()
 
         self.mqttc = mqtt.Client()
         # Assign event callbacks
@@ -111,16 +110,12 @@ class ThreadedMQTTLogger(Thread):
         except ValueError:
             return
 
-        # request prediction of flight
-        prediction = self.predictapiclient.make_request(parsed_pkt.current_time,
-                                                        180,
-                                                        parsed_pkt.current_alt,
-                                                        parsed_pkt.current_long,
-                                                        parsed_pkt.current_lat)
-        # save prediction to file.
-        file_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        file_name = 'prediction_at_{0}.json'.format(file_time)
-        self.filesaver.save_file(file_name, prediction.content)
+        self.pm.predict_and_save(parsed_pkt.current_time,
+                              parsed_pkt.current_alt,
+                              parsed_pkt.current_long,
+                              parsed_pkt.current_lat,
+                              "prediction_at")
+
 
 
 if __name__ == "__main__":

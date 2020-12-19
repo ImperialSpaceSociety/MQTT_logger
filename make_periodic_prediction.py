@@ -10,7 +10,7 @@ import pandas as pd
 import schedule
 from bisect import bisect_left, bisect_right
 from logger import init_logging
-
+from make_predictions_and_save import PredictionManager
 init_logging()
 
 
@@ -23,6 +23,7 @@ class PredictionSaver:
     def __init__(self):
         self.predictapiclient = PredictApiClient()
         self.filesaver = FileSaver()
+        self.pm = PredictionManager()
 
     @staticmethod
     def extract_datetimes(string):
@@ -65,17 +66,7 @@ class PredictionSaver:
         latest_prediction_file = self.get_latest_prediction_json_file()
         long,lat,alt = self.get_predicted_position_from_prediction_file_at_specified_timestamp(latest_prediction_file,current_time)
 
-
-        # request prediction of flight
-        prediction = self.predictapiclient.make_request(datetime.now(),
-                                                        180,
-                                                        alt,
-                                                        long,
-                                                        lat)
-        # save prediction to file.
-        file_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        file_name = 'forward_prediction_at_{0}.json'.format(file_time)
-        self.filesaver.save_file(file_name, prediction.content)
+        self.pm.predict_and_save(datetime.now(),alt,long,lat,"forward_prediction_at")
 
 
 if __name__ == "__main__":
