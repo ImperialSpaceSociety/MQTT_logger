@@ -59,9 +59,11 @@ class PredictionSaver:
 
     def save_prediction_on_past_prediction(self):
         """
-        :param incoming_pkt:
-        :return: None
+        Run a prediction from the position the last prediction expected the balloon to be at.
+        This will update the prediction as time goes by
+        :return:
         """
+
         current_time = pd.Timestamp.now()
         latest_prediction_file = self.get_latest_prediction_json_file()
         long,lat,alt = self.get_predicted_position_from_prediction_file_at_specified_timestamp(latest_prediction_file,current_time)
