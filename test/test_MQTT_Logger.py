@@ -16,13 +16,13 @@ class Testing_MQTT_Logger(TestCase):
         self.current_mqtt_packet = '{"app_id":"icss_lora_tracker","dev_id":"icspace23","hardware_serial":"0093BECA9134091B","port":99,"counter":41,"payload_raw":"a03IKRX5Hs4ARgH6HtEA4wBCYQf6HtEACQFmYQf6HtEAhgIRfQf6HtEA6QAErgf6HtEA4wBCYQf6HtEACQFmYQf6HtEAhgIRfQf6HtEA6QAErgf6HtEA4wBCYQf6HtEACQFmYQf6HtEAhgIRfQf6HtEA6QAErgc=","metadata":{"time":"2020-12-17T13:32:30.644741305Z","frequency":868.1,"modulation":"LORA","data_rate":"SF8BW125","airtime":389632000,"coding_rate":"4/5","gateways":[{"gtw_id":"eui-0000024b0b03046b","timestamp":2834815476,"time":"2020-12-15T13:32:30.62244Z","channel":0,"rssi":-66,"snr":11.2,"rf_chain":0,"latitude":51.96731,"longitude":1.35357,"altitude":32}]}}'
 
     def test_parsing_valid_packet(self):
-        self.TML.save_prediction(self.raw_mqtt_packet)
+        self.TML.manage_incoming_packet(self.raw_mqtt_packet)
 
     def test_parsing_future_valid_packet(self):
-        self.TML.save_prediction(self.current_mqtt_packet)
+        self.TML.manage_incoming_packet(self.current_mqtt_packet)
 
     def test_parsing_invalid_packet(self):
-        self.TML.save_prediction(self.mqtt_packet_with_none_payload)
+        self.TML.manage_incoming_packet(self.mqtt_packet_with_none_payload)
 
 
 if __name__ == '__main__':

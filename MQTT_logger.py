@@ -74,7 +74,7 @@ class ThreadedMQTTLogger(Thread):
     def on_message(self, mqttc, obj, msg):
         try:
             logging.info(msg.payload)
-            self.save_prediction(msg.payload)
+            self.manage_incoming_packet(msg.payload)
 
         except Exception as e:
             logging.critical(e, exc_info=True)  # log exception info at CRITICAL log level
@@ -95,7 +95,7 @@ class ThreadedMQTTLogger(Thread):
             else:
                 logging.error("unexpected disconnection")
 
-    def save_prediction(self, incoming_pkt: str):
+    def manage_incoming_packet(self, incoming_pkt: str):
         """
         Save a flight prediction from the exact point the balloon was last seen
         :param incoming_pkt:
