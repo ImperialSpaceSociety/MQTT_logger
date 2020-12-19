@@ -5,9 +5,11 @@ import re
 import time
 from datetime import datetime
 from pathlib import Path
-
-
+import json
+import pandas as pd
 import schedule
+from bisect import bisect_left, bisect_right
+
 
 from file_saver import FileSaver
 from prediction_api_client import PredictApiClient
@@ -15,7 +17,7 @@ regex_time_str = re.compile(r"(\d{4})-(\d{2})-(\d{2})_(\d{2})-(\d{2})-(\d{2})")
 
 class PredictionSaver:
     def __init__(self):
-        schedule.every().hour.at("00:00").do(self.save_prediction)
+        schedule.every().hour.at("00:00").do(self.save_prediction_on_past_prediction)
         self.predictapiclient = PredictApiClient()
         self.filesaver = FileSaver()
 
@@ -33,25 +35,50 @@ class PredictionSaver:
         sortedFiles = sorted(onlyfiles, key=lambda x: self.extract_datetimes(str(x)))
         return sortedFiles[-1]
 
-    def save_prediction(self):
+    def get_predicted_position_from_prediction_file_at_specified_timestamp(self, prediction_file: Path, timestamp):
+
+        df = pd.DataFrame()
+        with open(str(prediction_file)) as json_file:
+            data = json.load(json_file)
+            trajectory_dict = data["prediction"][1]["trajectory"]
+            df = pd.DataFrame.from_dict(trajectory_dict)
+
+            # Convert to datetime format. Have to remove last 3 decimal places for the parser to work
+            df['datetime'] = df['datetime'].str.slice(0, -4)
+            df['datetime_type'] = pd.to_datetime(df['datetime'])
+
+        # times stamps are sorted list so we can use bisect function to get the exact row
+        idx = bisect_left(df['datetime_type'].values, timestamp)
+
+
+        return df.at[idx,'longitude'], df.at[idx,'latitude'],df.at[idx,'altitude']
+
+    def save_prediction_on_past_prediction(self):
         """
         :param incoming_pkt:
         :return: None
         """
+        current_time = pd.Timestamp.now()
+        latest_prediction_file = self.get_latest_prediction_json_file()
+        long,lat,alt = self.get_predicted_position_from_prediction_file_at_specified_timestamp(latest_prediction_file,current_time)
+
 
         # request prediction of flight
         prediction = self.predictapiclient.make_request(datetime.now(),
                                                         180,
-                                                        parsed_pkt.current_alt,
-                                                        parsed_pkt.current_long,
-                                                        parsed_pkt.current_lat)
+                                                        alt,
+                                                        long,
+                                                        lat)
         # save prediction to file.
         file_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        file_name = 'prediction_at_{0}.json'.format(file_time)
+        file_name = 'forward_prediction_at_{0}.json'.format(file_time)
         self.filesaver.save_file(file_name, prediction.content)
 
 
 if __name__ == "__main__":
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
+
+    ps = PredictionSaver()
+    ps.save_prediction_on_past_prediction()
+    # while True:
+    #     schedule.run_pending()
+    #     time.sleep(1)

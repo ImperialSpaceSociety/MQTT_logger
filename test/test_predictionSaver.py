@@ -1,8 +1,11 @@
 from datetime import datetime
+from pathlib import Path
 from unittest import TestCase
 
+import pandas as pd
+
 from make_periodic_prediction import PredictionSaver
-from pathlib import Path
+
 
 class TestPredictionSaver(TestCase):
     def __init__(self, *args, **kwargs):
@@ -28,11 +31,17 @@ class TestPredictionSaver(TestCase):
 
     def test_get_latest_prediction_json_file(self):
         latest_file = self.ps.get_latest_prediction_json_file()
-        self.assertEqual(Path("../datadump/prediction_at_2020-12-18_12-54-25.json"),latest_file)
+        self.assertEqual(Path("../datadump/prediction_at_2020-12-18_12-54-25.json"), latest_file)
 
+    def test_get_predicted_position_from_prediction_file_at_specified_timestamp(self):
+        fp = Path("../datadump/prediction_at_2020-12-18_12-54-25.json")
 
-    # def test_get_latest_prediction(self):
-    #     self.fail()
+        expected_time = pd.Timestamp(year=2020,month=12,day=19,hour=1,minute=46,second=7)
 
-    # def test_save_prediction(self):
-    #     self.fail()
+        lat, long, alt = self.ps.get_predicted_position_from_prediction_file_at_specified_timestamp(fp, expected_time)
+        self.assertAlmostEqual(41.549955394115386, lat,delta=0.1)
+        self.assertAlmostEqual(56.15682667133098, long,delta=0.1)
+        self.assertAlmostEqual(10602, alt,delta=1)
+
+    def test_save_prediction_on_past_prediction(self):
+        self.ps.save_prediction_on_past_prediction()
