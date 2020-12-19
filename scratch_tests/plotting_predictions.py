@@ -5,7 +5,7 @@ import plotly.express as px
 import pandas as pd
 from matplotlib import pyplot as plt
 
-fp = Path("datadump/prediction_at_2020-12-18_12-54-25.json")
+fp = Path("../datadump/prediction_at_2020-12-18_12-54-25.json")
 
 with open(str(fp)) as json_file:
     data = json.load(json_file)
