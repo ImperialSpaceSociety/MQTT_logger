@@ -9,6 +9,10 @@ import json
 import pandas as pd
 import schedule
 from bisect import bisect_left, bisect_right
+from logger import init_logging
+
+init_logging()
+
 
 
 from file_saver import FileSaver
