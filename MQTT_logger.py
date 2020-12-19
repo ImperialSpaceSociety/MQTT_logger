@@ -115,6 +115,8 @@ class ThreadedMQTTLogger(Thread):
         parsed_pkt = PacketParser(incoming_pkt) # TODO: figure out how to fake the parsed packet with current time.
 
         try:
+            logging.debug("parsing incoming packet" + str(incoming_pkt))
+
             parsed_pkt.parse_packet()
         except ValueError:
             return
