@@ -29,7 +29,7 @@ class PredictionSaver:
         return target_time
 
     def get_latest_prediction_json_file(self):
-        p = Path(r'../datadump/')
+        p = Path(r'datadump/')
         onlyfiles = p.rglob('*')
 
         sortedFiles = sorted(onlyfiles, key=lambda x: self.extract_datetimes(str(x)))
