@@ -21,7 +21,6 @@ regex_time_str = re.compile(r"(\d{4})-(\d{2})-(\d{2})_(\d{2})-(\d{2})-(\d{2})")
 
 class PredictionSaver:
     def __init__(self):
-        schedule.every().hour.at("00:00").do(self.save_prediction_on_past_prediction)
         self.predictapiclient = PredictApiClient()
         self.filesaver = FileSaver()
 
@@ -83,6 +82,10 @@ if __name__ == "__main__":
 
     ps = PredictionSaver()
     ps.save_prediction_on_past_prediction()
-    # while True:
-    #     schedule.run_pending()
-    #     time.sleep(1)
+
+
+    schedule.every().hour.at("00:00").do(ps.save_prediction_on_past_prediction)
+
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
