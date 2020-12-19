@@ -69,7 +69,7 @@ class PredictionSaver:
         This will update the prediction as time goes by
         :return:
         """
-
+        logging.debug("Saving prediction on past prediction")
         current_time = pd.Timestamp.now()
         p = Path(r'datadump/')
 
