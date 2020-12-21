@@ -28,6 +28,13 @@ class TestPredictionSaver(TestCase):
         expected_datetime = datetime(2020, 12, 17, 14, 52, 19)
 
         self.assertEqual(expected_datetime, dt)
+    def test_2_extract_datetimes_with_different_prefix(self):
+        filename_str = "datadump/prediction_at_2020-12-18_11-55-08.json"
+        dt = self.ps.extract_datetimes(filename_str)
+
+        expected_datetime = datetime(2020, 12, 18, 11, 55, 8)
+
+        self.assertEqual(expected_datetime, dt)
 
     def test_get_latest_prediction_json_file(self):
         p = Path(r'../datadump/')
