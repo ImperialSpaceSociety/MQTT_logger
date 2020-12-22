@@ -5,7 +5,7 @@ import time
 from bisect import bisect_left
 from datetime import datetime
 from pathlib import Path
-
+from plotting_predictions import PredictionPlotter
 import pandas as pd
 import schedule
 
@@ -14,7 +14,7 @@ from prediction_manager import PredictionManager
 
 init_logging()
 
-from file_saver import FileSaver
+from file_saver import FileSaver, data_dump_location
 
 regex_time_str = re.compile(r"(\d{4})-(\d{2})-(\d{2})_(\d{2})-(\d{2})-(\d{2})")
 
@@ -24,6 +24,8 @@ class PredictionSaver:
         self.filesaver = FileSaver()
         self.pm = PredictionManager()
         logging.debug("Initialised periodic prediction saver")
+        self.pp = PredictionPlotter()
+
 
     @staticmethod
     def extract_datetimes(string):
@@ -39,8 +41,11 @@ class PredictionSaver:
         :return: Pathlib object of more recent prediction json file.
         """
         onlyfiles = p.rglob('*')
+        latest = self.get_latest_file_from_file_list(onlyfiles)
+        return latest
 
-        sortedFiles = sorted(onlyfiles, key=lambda x: self.extract_datetimes(str(x)))
+    def get_latest_file_from_file_list(self, file_list: list):
+        sortedFiles = sorted(file_list, key=lambda x: self.extract_datetimes(str(x)))
         return sortedFiles[-1]
 
     def get_predicted_position_from_prediction_file_at_specified_timestamp(self, prediction_file: Path, timestamp):
@@ -67,22 +72,22 @@ class PredictionSaver:
         """
         logging.debug("Saving prediction on past prediction")
         current_time = pd.Timestamp.now()
-        p = Path(r'datadump/')
 
-        latest_prediction_file = self.get_latest_prediction_json_file(p)
+        latest_prediction_file = self.get_latest_prediction_json_file(data_dump_location)
         long, lat, alt = self.get_predicted_position_from_prediction_file_at_specified_timestamp(latest_prediction_file,
                                                                                                  current_time)
         logging.debug("Balloon expected to be long={0} lat={1} alt={2} now".format(long, lat, alt))
 
         filename = self.pm.gen_filename("forward_prediction_at")
         self.pm.predict_and_save(datetime.now(), alt, long, lat, filename)
+        self.pp.plot_and_save(data_dump_location/filename)
 
 
 if __name__ == "__main__":
 
     ps = PredictionSaver()
     logging.info("scheduling jobs for periodic running of predictions")
-    # ps.save_prediction_on_past_prediction()
+    ps.save_prediction_on_past_prediction()
 
     job = ps.save_prediction_on_past_prediction
     schedule.every().day.at("00:00").do(job)
