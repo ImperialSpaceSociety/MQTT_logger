@@ -15,14 +15,12 @@ from prediction_manager import PredictionManager
 init_logging()
 
 from file_saver import FileSaver
-from prediction_api_client import PredictApiClient
 
 regex_time_str = re.compile(r"(\d{4})-(\d{2})-(\d{2})_(\d{2})-(\d{2})-(\d{2})")
 
 
 class PredictionSaver:
     def __init__(self):
-        self.predictapiclient = PredictApiClient()
         self.filesaver = FileSaver()
         self.pm = PredictionManager()
         logging.debug("Initialised periodic prediction saver")
