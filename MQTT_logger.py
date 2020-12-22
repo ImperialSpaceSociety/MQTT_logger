@@ -110,11 +110,12 @@ class ThreadedMQTTLogger(Thread):
         except ValueError:
             return
 
+        filename = self.pm.gen_filename("prediction_at")
         self.pm.predict_and_save(parsed_pkt.current_time,
                               parsed_pkt.current_alt,
                               parsed_pkt.current_long,
                               parsed_pkt.current_lat,
-                              "prediction_at")
+                              filename)
 
 
 

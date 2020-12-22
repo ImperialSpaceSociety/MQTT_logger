@@ -76,7 +76,8 @@ class PredictionSaver:
                                                                                                  current_time)
         logging.debug("Balloon expected to be long={0} lat={1} alt={2} now".format(long, lat, alt))
 
-        self.pm.predict_and_save(datetime.now(),alt,long,lat,"forward_prediction_at")
+        filename = self.pm.gen_filename("forward_prediction_at")
+        self.pm.predict_and_save(datetime.now(), alt, long, lat, filename)
 
 
 if __name__ == "__main__":
