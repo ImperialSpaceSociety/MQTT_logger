@@ -1,6 +1,6 @@
 paho-mqtt==1.5.1
 requests
 pandas
-
+plotly
 # for tests
 freezegun
