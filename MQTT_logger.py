@@ -18,7 +18,7 @@ from threading import Thread
 import paho.mqtt.client as mqtt
 
 from packet_parser import PacketParser
-from make_predictions_and_save import PredictionManager
+from prediction_manager import PredictionManager
 
 
 init_logging()

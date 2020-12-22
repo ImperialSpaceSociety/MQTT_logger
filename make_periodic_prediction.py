@@ -10,7 +10,7 @@ import pandas as pd
 import schedule
 
 from logger import init_logging
-from make_predictions_and_save import PredictionManager
+from prediction_manager import PredictionManager
 
 init_logging()
 
