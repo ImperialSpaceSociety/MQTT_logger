@@ -10,16 +10,15 @@
 # threaded example credit; https://forum.derivative.ca/t/python-threaded-tcp-socket-server-example/12002/5
 ########################################################################################################################
 import logging
-from logger import init_logging
-
-from datetime import datetime
 from threading import Thread
 
 import paho.mqtt.client as mqtt
 
+from logger import init_logging
 from packet_parser import PacketParser
 from prediction_manager import PredictionManager
-
+from plotting_predictions import PredictionPlotter
+from file_saver import data_dump_location,html_render_location
 
 init_logging()
 
@@ -27,6 +26,7 @@ init_logging()
 class ThreadedMQTTLogger(Thread):
     def __init__(self, APPID, PSW):
         self.pm = PredictionManager()
+        self.pp = PredictionPlotter()
 
         self.mqttc = mqtt.Client()
         # Assign event callbacks
@@ -101,7 +101,7 @@ class ThreadedMQTTLogger(Thread):
         :return: None
         """
         # parse packet
-        parsed_pkt = PacketParser(incoming_pkt) # TODO: figure out how to fake the parsed packet with current time.
+        parsed_pkt = PacketParser(incoming_pkt)  # TODO: figure out how to fake the parsed packet with current time.
 
         try:
             logging.debug("parsing incoming packet" + str(incoming_pkt))
@@ -112,12 +112,12 @@ class ThreadedMQTTLogger(Thread):
 
         filename = self.pm.gen_filename("prediction_at")
         self.pm.predict_and_save(parsed_pkt.current_time,
-                              parsed_pkt.current_alt,
-                              parsed_pkt.current_long,
-                              parsed_pkt.current_lat,
-                              filename)
+                                 parsed_pkt.current_alt,
+                                 parsed_pkt.current_long,
+                                 parsed_pkt.current_lat,
+                                 filename)
 
-
+        self.pp.plot_and_save(data_dump_location/filename)
 
 if __name__ == "__main__":
     APPID = "icss_lora_tracker"
