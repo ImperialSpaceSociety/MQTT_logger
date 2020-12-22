@@ -19,7 +19,7 @@ class PredictionPlotter:
             df['datetime'] = df['datetime'].str.slice(0, -4)
             df['datetime_type'] = pd.to_datetime(df['datetime'])
 
-            fig = px.scatter_mapbox(df, lat="latitude", lon="longitude", hover_data=["altitude", "datetime"], zoom=1)
+            fig = px.line_geo(df, lat="latitude", lon="longitude", hover_data=["altitude", "datetime"],projection="orthographic")
 
             fig.update_layout(mapbox_style="open-street-map")
             fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0})
