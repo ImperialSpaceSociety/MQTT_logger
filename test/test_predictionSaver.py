@@ -36,10 +36,13 @@ class TestPredictionSaver(TestCase):
 
         self.assertEqual(expected_datetime, dt)
 
-    def test_get_latest_prediction_json_file(self):
-        p = Path(r'../datadump/')
+    def test_get_latest_prediction_from_file_list(self):
+        file_list = [Path("../datadump/prediction_at_2020-12-18_12-54-25.json"),
+                     Path("../datadump/prediction_at_2020-11-18_12-54-25.json"),
+                     Path("../datadump/prediction_at_2020-11-16_12-54-25.json"),
+                     Path("../datadump/prediction_at_2020-11-18_11-54-25.json")]
 
-        latest_file = self.ps.get_latest_prediction_json_file(p)
+        latest_file = self.ps.get_latest_file_from_file_list(file_list)
         self.assertEqual(Path("../datadump/prediction_at_2020-12-18_12-54-25.json"), latest_file)
 
     def test_get_predicted_position_from_prediction_file_at_specified_timestamp(self):
