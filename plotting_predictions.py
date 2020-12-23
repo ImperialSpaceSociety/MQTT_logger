@@ -25,6 +25,10 @@ class PredictionPlotter:
 
             #fig.update_layout(mapbox_style="open-street-map")
             fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0})
+            fig.update_geos(
+                resolution=110,
+                showcountries=True
+            )
             return fig
 
     def save_plot(self, fig):
