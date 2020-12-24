@@ -8,9 +8,7 @@ from make_periodic_prediction import PredictionSaver
 
 
 class TestPredictionSaver(TestCase):
-    def __init__(self, *args, **kwargs):
-        super(TestPredictionSaver, self).__init__(*args, **kwargs)
-
+    def setUp(self) -> None:
         self.ps = PredictionSaver()
 
     def test_extract_datetimes(self):

@@ -5,8 +5,7 @@ from MQTT_logger import ThreadedMQTTLogger
 
 
 class Testing_MQTT_Logger(TestCase):
-    def __init__(self, *args, **kwargs):
-        super(Testing_MQTT_Logger, self).__init__(*args, **kwargs)
+    def setUp(self) -> None:
 
         APPID = "icss_lora_tracker"
         PSW = 'ttn-account-v2.vlMjFic1AU9Dr-bAI18X6kzc5lSJGbFoeLbbASramBg'
