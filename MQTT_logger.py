@@ -22,6 +22,7 @@ from file_saver import data_dump_location,html_render_location
 
 init_logging()
 
+REQUIRED_DEVICE_ID_TO_TRACK = "icspace23"
 
 class ThreadedMQTTLogger(Thread):
     def __init__(self, APPID, PSW):
@@ -108,6 +109,10 @@ class ThreadedMQTTLogger(Thread):
 
             parsed_pkt.parse_packet()
         except ValueError:
+            return
+
+        # Track only ICSPACE23
+        if parsed_pkt.device_id is not REQUIRED_DEVICE_ID_TO_TRACK:
             return
 
         filename = self.pm.gen_filename("prediction_at")

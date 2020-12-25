@@ -27,6 +27,12 @@ class Test_Scorer(TestCase):
 
         self.assertAlmostEqual(83, pac.current_alt, delta=0.00001)
 
+    def test_if_current_device_id_is_parsed_correctly(self):
+        pac = PacketParser(raw_packet=self.raw_mqtt_packet)
+        pac.parse_packet()
+
+        self.assertEqual("icspace23", pac.device_id)
+
     def test_if_current_time_is_parsed_correctly(self):
         pac = PacketParser(raw_packet=self.raw_mqtt_packet)
         pac.parse_packet()

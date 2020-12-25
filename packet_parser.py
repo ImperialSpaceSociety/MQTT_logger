@@ -9,6 +9,7 @@ class PacketParser:
         self.current_lat = 0
         self.current_alt = 0
         self.current_time = 0
+        self.device_id = ""
 
 
     def parse_packet(self):
@@ -23,6 +24,7 @@ class PacketParser:
         if raw_payload == None:
             raise ValueError("No payload found")
 
+        self.device_id = payload_json["dev_id"]
 
         hex_payload = base64.b64decode(raw_payload)
 
