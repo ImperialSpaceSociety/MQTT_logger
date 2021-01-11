@@ -49,5 +49,3 @@ class PacketParser:
         self.current_long = int.from_bytes(hex_payload[7:9], byteorder="little", signed=True) * 0xffff / 1e7
         self.current_lat = int.from_bytes(hex_payload[5:7], byteorder="little", signed=True) * 0xffff / 1e7
         self.current_alt = int(int.from_bytes(hex_payload[9:11], byteorder="little", signed=False) * 0xff / 1000)
-
-        print("pressure", self.pressure)
