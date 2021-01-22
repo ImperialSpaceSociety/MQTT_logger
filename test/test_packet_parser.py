@@ -13,8 +13,8 @@ class Test_Scorer(TestCase):
         pac = PacketParser(raw_packet=self.raw_mqtt_packet)
         pac.parse_raw_payload(self.test_raw_payload)
 
-        self.assertEqual(8, pac.num_sats)
         self.assertEqual(16688, pac.current_alt)
+        self.assertEqual(8, pac.num_sats)
         self.assertAlmostEqual(-0.209712, pac.current_long, delta=0.00001)
         self.assertAlmostEqual(51.530170, pac.current_lat, delta=0.00001)
 
