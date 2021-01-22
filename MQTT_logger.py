@@ -22,7 +22,7 @@ from file_saver import data_dump_location,html_render_location
 
 init_logging()
 
-REQUIRED_DEVICE_ID_TO_TRACK = "icspace23"
+REQUIRED_DEVICE_ID_TO_TRACK = "icspace24"
 
 class ThreadedMQTTLogger(Thread):
     def __init__(self, APPID, PSW):
@@ -108,11 +108,17 @@ class ThreadedMQTTLogger(Thread):
             logging.debug("parsing incoming packet" + str(incoming_pkt))
 
             parsed_pkt.parse_packet()
+
         except ValueError:
+            logging.exception("Value error")
+            return
+        except KeyError:
+            logging.exception("Not the right type of message")
             return
 
         # Track only ICSPACE23
-        if parsed_pkt.device_id is not REQUIRED_DEVICE_ID_TO_TRACK:
+        if parsed_pkt.device_id != REQUIRED_DEVICE_ID_TO_TRACK:
+            logging.exception("Wrong flight")
             return
 
         filename = self.pm.gen_filename("prediction_at")
