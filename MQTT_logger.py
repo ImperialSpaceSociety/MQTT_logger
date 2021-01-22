@@ -13,6 +13,7 @@ import logging
 from threading import Thread
 
 import paho.mqtt.client as mqtt
+from pysolar.solar import get_altitude
 
 from logger import init_logging
 from packet_parser import PacketParser
@@ -120,6 +121,9 @@ class ThreadedMQTTLogger(Thread):
         if parsed_pkt.device_id != REQUIRED_DEVICE_ID_TO_TRACK:
             logging.exception("Wrong flight")
             return
+
+        elevation = get_altitude(longitude_deg=parsed_pkt.current_long, latitude_deg=parsed_pkt.current_lat, when=parsed_pkt.current_time)
+        logging.info("Solar elevation is at {0} degrees.".format(elevation))
 
         filename = self.pm.gen_filename("prediction_at")
         self.pm.predict_and_save(parsed_pkt.current_time,

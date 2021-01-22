@@ -1,6 +1,8 @@
 import base64
 import json
 from datetime import datetime
+from datetime import timezone
+
 
 class PacketParser:
     def __init__(self, raw_packet):
@@ -24,6 +26,8 @@ class PacketParser:
 
         date_time_str = payload_json["metadata"]["time"][:-4]
         self.current_time = datetime.strptime(date_time_str, '%Y-%m-%dT%H:%M:%S.%f')
+        self.current_time = self.current_time.replace(tzinfo=timezone.utc)
+
         self.device_id = payload_json["dev_id"]
 
 
