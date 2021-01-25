@@ -3,6 +3,8 @@ from pathlib import Path
 
 import pandas as pd
 import plotly.express as px
+from pysolar.solar import get_altitude
+from datetime import datetime, timedelta, timezone
 
 from file_saver import data_dump_location, html_render_location
 
@@ -19,7 +21,18 @@ class PredictionPlotter:
             df['datetime'] = df['datetime'].str.slice(0, -4)
             df['datetime_type'] = pd.to_datetime(df['datetime'])
 
-            fig = px.line_geo(df, lat="latitude", lon="longitude", hover_data=["altitude", "datetime"],
+            # Hacky section to calculate solar elevation for display.
+            # TODO: convert this into more pandas/numpy form.
+            ts_list = df["datetime_type"].dt.to_pydatetime().tolist()
+
+            solar_elevation_list = []
+            for i in range(len(ts_list)):
+                elevation = get_altitude(longitude_deg=df["longitude"][i], latitude_deg=df["latitude"][i], when=ts_list[i].replace(tzinfo=timezone.utc))
+                solar_elevation_list.append(elevation)
+
+            df["solar_elevation"] = solar_elevation_list
+
+            fig = px.line_geo(df, lat="latitude", lon="longitude", hover_data=["altitude", "datetime","solar_elevation"],
                               projection="orthographic",
                               )
 
