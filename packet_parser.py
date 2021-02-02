@@ -45,7 +45,7 @@ class PacketParser:
 
         self.pressure = ((hex_payload[2] >> 1) & 0b01111111) * 10
         self.reset_cnt = hex_payload[3] & 0b00000111
-        self.boardTemp = hex_payload[4]
+        self.boardTemp = int.from_bytes(hex_payload[4:5], byteorder="little", signed=True)
         self.noloadVoltage = ((hex_payload[0] >> 3) & 0b00011111) + 18
         self.loadVoltage = (((hex_payload[0] << 2) & 0b00011100) | ((hex_payload[1] >> 6) & 0b00000011)) + 18
         self.days_of_playback = hex_payload[1] & 0b00111111
