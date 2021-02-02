@@ -19,7 +19,7 @@ class PacketParser:
         self.reset_cnt = 0
         self.boardTemp = 0
         self.device_id = ""
-
+        self.past_positions = []
 
     def parse_packet(self):
         payload_json = json.loads(self.raw_packet)
@@ -36,10 +36,10 @@ class PacketParser:
         if raw_payload == None:
             raise ValueError("No payload found")
 
+        self.parse_raw_payload(raw_payload, self.current_time)
 
-        self.parse_raw_payload(raw_payload)
 
-    def parse_raw_payload(self,raw_payload):
+    def parse_raw_payload(self, raw_payload, current_time):
 
         hex_payload = base64.b64decode(raw_payload)
 
@@ -53,3 +53,27 @@ class PacketParser:
         self.current_long = int.from_bytes(hex_payload[7:9], byteorder="little", signed=True) * 0xffff / 1e7
         self.current_lat = int.from_bytes(hex_payload[5:7], byteorder="little", signed=True) * 0xffff / 1e7
         self.current_alt = int(int.from_bytes(hex_payload[9:11], byteorder="little", signed=False) * 0xff / 1000)
+
+        past_data_size = 8  # Number of bytes to store one set of past long,lat,alt, timestamp
+
+        self.past_positions = []
+        for i in range(13):
+            offset = (i + 1) * past_data_size
+            current_long = int.from_bytes(hex_payload[13 + offset:15 + offset], byteorder="little",
+                                          signed=True) * 0xffff / 1e7
+            current_lat = int.from_bytes(hex_payload[11 + offset:13 + offset], byteorder="little",
+                                         signed=True) * 0xffff / 1e7
+            current_alt = int(
+                int.from_bytes(hex_payload[15 + offset:17 + offset], byteorder="little", signed=False) * 0xff / 1000)
+            time = datetime.fromtimestamp(
+                datetime.timestamp(current_time) - int.from_bytes(hex_payload[17 + offset:19 + offset],
+                                                                  byteorder="little", signed=False) * 60)
+
+            past_pos = {
+                "altitude": current_alt,
+                "latitude": current_lat,
+                "longitude": current_long,
+                "time_stamp": time
+            }
+
+            self.past_positions.append(past_pos)
