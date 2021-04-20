@@ -5,6 +5,7 @@ import requests
 from file_saver import FileSaver
 
 BASE_URL = "http://predict.cusf.co.uk/api/v1/"
+HOURS_AHEAD_TO_PREDICT = 120  # hours
 
 
 class PredictionManager:
@@ -13,7 +14,7 @@ class PredictionManager:
 
     def predict_and_save(self, ts, alt, long, lat, file_name):
         # request prediction of flight
-        prediction = self.make_request(ts, 120, alt, long, lat)
+        prediction = self.make_request(ts, HOURS_AHEAD_TO_PREDICT, alt, long, lat)
         # save prediction to file.
         self.filesaver.save_file(file_name, prediction.content)
 
