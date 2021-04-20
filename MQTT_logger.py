@@ -23,7 +23,7 @@ from file_saver import data_dump_location,html_render_location
 
 init_logging()
 
-REQUIRED_DEVICE_ID_TO_TRACK = "icspace24"
+REQUIRED_DEVICE_ID_TO_TRACK = "icspace25_ttnv2_abp"
 
 class ThreadedMQTTLogger(Thread):
     def __init__(self, APPID, PSW):
