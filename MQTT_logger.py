@@ -9,28 +9,26 @@
 #
 # threaded example credit; https://forum.derivative.ca/t/python-threaded-tcp-socket-server-example/12002/5
 ########################################################################################################################
-
-
 import logging
-import sys
 from threading import Thread
 
 import paho.mqtt.client as mqtt
+from pysolar.solar import get_altitude
 
-logger = logging.getLogger('')
-logger.setLevel(logging.DEBUG)
-fh = logging.FileHandler('mqtt.txt')
-sh = logging.StreamHandler(sys.stdout)
-formatter = logging.Formatter('[%(asctime)s] %(levelname)s %(message)s',
-                              datefmt='%a, %d %b %Y %H:%M:%S')
-fh.setFormatter(formatter)
-sh.setFormatter(formatter)
-logger.addHandler(fh)
-logger.addHandler(sh)
+from logger import init_logging
+from packet_parser import PacketParser
+from prediction_manager import PredictionManager
+from plotting_predictions import PredictionPlotter
+from file_saver import data_dump_location,html_render_location
 
+init_logging()
+
+REQUIRED_DEVICE_ID_TO_TRACK = "icspace25_ttnv2_abp"
 
 class ThreadedMQTTLogger(Thread):
     def __init__(self, APPID, PSW):
+        self.pm = PredictionManager()
+        self.pp = PredictionPlotter()
 
         self.mqttc = mqtt.Client()
         # Assign event callbacks
@@ -77,6 +75,8 @@ class ThreadedMQTTLogger(Thread):
     def on_message(self, mqttc, obj, msg):
         try:
             logging.info(msg.payload)
+            self.manage_incoming_packet(msg.payload)
+
         except Exception as e:
             logging.critical(e, exc_info=True)  # log exception info at CRITICAL log level
 
@@ -96,10 +96,46 @@ class ThreadedMQTTLogger(Thread):
             else:
                 logging.error("unexpected disconnection")
 
+    def manage_incoming_packet(self, incoming_pkt: str):
+        """
+        Save a flight prediction from the exact point the balloon was last seen
+        :param incoming_pkt:
+        :return: None
+        """
+        # parse packet
+        parsed_pkt = PacketParser(incoming_pkt)  # TODO: figure out how to fake the parsed packet with current time.
+
+        try:
+            logging.debug("parsing incoming packet" + str(incoming_pkt))
+
+            parsed_pkt.parse_packet()
+
+        except ValueError:
+            logging.exception("Value error")
+            return
+        except KeyError:
+            logging.exception("Not the right type of message")
+            return
+
+        # Track only ICSPACE23
+        if parsed_pkt.device_id != REQUIRED_DEVICE_ID_TO_TRACK:
+            logging.exception("Wrong flight")
+            return
+
+        elevation = get_altitude(longitude_deg=parsed_pkt.current_long, latitude_deg=parsed_pkt.current_lat, when=parsed_pkt.current_time)
+        logging.info("Solar elevation is at {0} degrees.".format(elevation))
+
+        filename = self.pm.gen_filename("prediction_at")
+        self.pm.predict_and_save(parsed_pkt.current_time,
+                                 parsed_pkt.current_alt,
+                                 parsed_pkt.current_long,
+                                 parsed_pkt.current_lat,
+                                 filename)
+
+        self.pp.plot_and_save(data_dump_location/filename)
 
 if __name__ == "__main__":
     APPID = "icss_lora_tracker"
     PSW = 'ttn-account-v2.vlMjFic1AU9Dr-bAI18X6kzc5lSJGbFoeLbbASramBg'
     mqttlogger = ThreadedMQTTLogger(APPID, PSW)
     mqttlogger.start()
-
