@@ -23,7 +23,7 @@ from file_saver import data_dump_location,html_render_location
 
 init_logging()
 
-REQUIRED_DEVICE_ID_TO_TRACK = "icspace25_ttnv2_abp"
+REQUIRED_DEVICE_ID_TO_TRACK = "icspace26-ttnv3-abp-eu"
 
 class ThreadedMQTTLogger(Thread):
     def __init__(self, APPID, PSW, Server_address):
@@ -65,7 +65,7 @@ class ThreadedMQTTLogger(Thread):
 
         if rc == 0:
             # subscribe for all devices of user
-            res_1 = mqttc.subscribe('+/devices/+/up')
+            res_1 = mqttc.subscribe('v3/+/devices/+/up')
             res = mqttc.subscribe('+/devices/+/events/#')
 
             if res[0] != mqtt.MQTT_ERR_SUCCESS:
@@ -108,7 +108,7 @@ class ThreadedMQTTLogger(Thread):
         try:
             logging.debug("parsing incoming packet" + str(incoming_pkt))
 
-            parsed_pkt.parse_packet()
+            parsed_pkt.parse_packet_v3()
 
         except ValueError:
             logging.exception("Value error")
