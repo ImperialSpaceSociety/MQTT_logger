@@ -38,6 +38,23 @@ class PacketParser:
 
         self.parse_raw_payload(raw_payload, self.current_time)
 
+    def parse_packet_v3(self):
+        payload_json = json.loads(self.raw_packet)
+
+        date_time_str = payload_json["received_at"][:-4]
+        self.current_time = datetime.strptime(date_time_str, '%Y-%m-%dT%H:%M:%S.%f')
+        self.current_time = self.current_time.replace(tzinfo=timezone.utc)
+
+        self.device_id = payload_json["end_device_ids"]["device_id"]
+
+
+        raw_payload = payload_json["uplink_message"]["frm_payload"]
+
+        if raw_payload == None:
+            raise ValueError("No payload found")
+
+        self.parse_raw_payload(raw_payload, self.current_time)
+
 
     def parse_raw_payload(self, raw_payload, current_time):
 
