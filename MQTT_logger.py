@@ -26,7 +26,7 @@ init_logging()
 REQUIRED_DEVICE_ID_TO_TRACK = "icspace25_ttnv2_abp"
 
 class ThreadedMQTTLogger(Thread):
-    def __init__(self, APPID, PSW):
+    def __init__(self, APPID, PSW, Server_address):
         self.pm = PredictionManager()
         self.pp = PredictionPlotter()
 
@@ -45,7 +45,7 @@ class ThreadedMQTTLogger(Thread):
         self.mqttc.reconnect_delay_set(min_delay=1, max_delay=120)
 
         self.mqttc.username_pw_set(APPID, PSW)
-        self.mqttc.connect("eu.thethings.network", 1883, 60)
+        self.mqttc.connect(Server_address, 1883, 60)
 
         Thread.__init__(self)
         logging.info("Running MQTT Logger")
@@ -137,5 +137,11 @@ class ThreadedMQTTLogger(Thread):
 if __name__ == "__main__":
     APPID = "icss_lora_tracker"
     PSW = 'ttn-account-v2.vlMjFic1AU9Dr-bAI18X6kzc5lSJGbFoeLbbASramBg'
-    mqttlogger = ThreadedMQTTLogger(APPID, PSW)
+    mqttlogger = ThreadedMQTTLogger(APPID, PSW,"eu.thethings.network")
     mqttlogger.start()
+
+    APPID = "icss-lora-tracker@ttn"
+    PSW = 'NNSXS.5AHU5RFIHMCRXPQLLJIYOHPAIL6UCBUMJWMNONA.ZZL4WF6XCRS2ZPXVPKORTRVI4X3AP7VWNBLZ6QCA4RIZY3FMGQAA'
+    mqttlogger_ttnv3 = ThreadedMQTTLogger(APPID, PSW,"eu1.cloud.thethings.network")
+    mqttlogger_ttnv3.start()
+
