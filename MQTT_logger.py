@@ -15,15 +15,16 @@ from threading import Thread
 import paho.mqtt.client as mqtt
 from pysolar.solar import get_altitude
 
+from file_saver import data_dump_location
 from logger import init_logging
 from packet_parser import PacketParser
-from prediction_manager import PredictionManager
 from plotting_predictions import PredictionPlotter
-from file_saver import data_dump_location,html_render_location
+from prediction_manager import PredictionManager
 
 init_logging()
 
 REQUIRED_DEVICE_ID_TO_TRACK = "icspace26-ttnv3-abp-eu"
+
 
 class ThreadedMQTTLogger(Thread):
     def __init__(self, APPID, PSW, Server_address):
@@ -132,16 +133,16 @@ class ThreadedMQTTLogger(Thread):
                                  parsed_pkt.current_lat,
                                  filename)
 
-        self.pp.plot_and_save(data_dump_location/filename)
+        self.pp.plot_and_save(data_dump_location / filename)
+
 
 if __name__ == "__main__":
     APPID = "icss_lora_tracker"
     PSW = 'ttn-account-v2.vlMjFic1AU9Dr-bAI18X6kzc5lSJGbFoeLbbASramBg'
-    mqttlogger = ThreadedMQTTLogger(APPID, PSW,"eu.thethings.network")
+    mqttlogger = ThreadedMQTTLogger(APPID, PSW, "eu.thethings.network")
     mqttlogger.start()
 
     APPID = "icss-lora-tracker@ttn"
     PSW = 'NNSXS.5AHU5RFIHMCRXPQLLJIYOHPAIL6UCBUMJWMNONA.ZZL4WF6XCRS2ZPXVPKORTRVI4X3AP7VWNBLZ6QCA4RIZY3FMGQAA'
-    mqttlogger_ttnv3 = ThreadedMQTTLogger(APPID, PSW,"eu1.cloud.thethings.network")
+    mqttlogger_ttnv3 = ThreadedMQTTLogger(APPID, PSW, "eu1.cloud.thethings.network")
     mqttlogger_ttnv3.start()
-
