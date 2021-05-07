@@ -65,3 +65,21 @@ class Test_Scorer(TestCase):
         pac.parse_packet_v3()
 
         self.assertEqual("icspace26-ttnv3-abp-eu", pac.device_id)
+
+    def test_if_current_long_is_parsed_correctly_v3(self):
+        pac = PacketParser(raw_packet=self.raw_ttnv3_packet)
+        pac.parse_packet_v3()
+
+        self.assertAlmostEqual(0, pac.current_long, delta=0.00001)
+
+    def test_if_current_lat_is_parsed_correctly_v3(self):
+        pac = PacketParser(raw_packet=self.raw_ttnv3_packet)
+        pac.parse_packet_v3()
+
+        self.assertAlmostEqual(0, pac.current_lat, delta=0.00001)
+
+    def test_if_current_alt_is_parsed_correctly_v3(self):
+        pac = PacketParser(raw_packet=self.raw_ttnv3_packet)
+        pac.parse_packet_v3()
+
+        self.assertAlmostEqual(0, pac.current_alt, delta=0.00001)
