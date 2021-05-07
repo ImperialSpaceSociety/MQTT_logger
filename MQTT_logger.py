@@ -123,7 +123,11 @@ class ThreadedMQTTLogger(Thread):
             logging.exception("Wrong flight")
             return
 
-        elevation = get_altitude(longitude_deg=parsed_pkt.current_long, latitude_deg=parsed_pkt.current_lat, when=parsed_pkt.current_time)
+        logging.info("Current Position data: longitude = {0}, latitude = {1}, altitude = {2}, time = {3}".format(
+            parsed_pkt.current_long, parsed_pkt.current_lat, parsed_pkt.current_alt, parsed_pkt.current_time))
+
+        elevation = get_altitude(longitude_deg=parsed_pkt.current_long, latitude_deg=parsed_pkt.current_lat,
+                                 when=parsed_pkt.current_time)
         logging.info("Solar elevation is at {0} degrees.".format(elevation))
 
         filename = self.pm.gen_filename("prediction_at")
