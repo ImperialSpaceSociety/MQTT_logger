@@ -51,7 +51,7 @@ class Test_Scorer(TestCase):
     def test_if_current_time_is_parsed_correctly(self):
         pac = PacketParser(raw_packet=self.raw_mqtt_packet)
         pac.parse_packet()
-        target_time = datetime(2020, 12, 15, 13, 32, 30)
+        target_time = datetime(2020, 12, 15, 13, 32, 30, tzinfo=timezone.utc)
 
         self.assertAlmostEqual(target_time, pac.current_time, delta=timedelta(seconds=1))
 
