@@ -1,3 +1,8 @@
+/*
+ * Created Date: Wednesday, July 7th 2021, 11:43:21 pm
+ * Author: Medad Newman
+ * 
+ */
 
 function decodeUplink(input) {
     "use strict";
