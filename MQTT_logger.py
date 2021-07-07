@@ -15,18 +15,19 @@ from threading import Thread
 import paho.mqtt.client as mqtt
 from pysolar.solar import get_altitude
 
+from file_saver import data_dump_location
 from logger import init_logging
 from packet_parser import PacketParser
-from prediction_manager import PredictionManager
 from plotting_predictions import PredictionPlotter
-from file_saver import data_dump_location,html_render_location
+from prediction_manager import PredictionManager
 
 init_logging()
 
-REQUIRED_DEVICE_ID_TO_TRACK = "icspace25_ttnv2_abp"
+REQUIRED_DEVICE_ID_TO_TRACK = "icspace26-ttnv3-abp-eu"
+
 
 class ThreadedMQTTLogger(Thread):
-    def __init__(self, APPID, PSW):
+    def __init__(self, APPID, PSW, Server_address):
         self.pm = PredictionManager()
         self.pp = PredictionPlotter()
 
@@ -45,7 +46,7 @@ class ThreadedMQTTLogger(Thread):
         self.mqttc.reconnect_delay_set(min_delay=1, max_delay=120)
 
         self.mqttc.username_pw_set(APPID, PSW)
-        self.mqttc.connect("eu.thethings.network", 1883, 60)
+        self.mqttc.connect(Server_address, 1883, 60)
 
         Thread.__init__(self)
         logging.info("Running MQTT Logger")
@@ -65,7 +66,7 @@ class ThreadedMQTTLogger(Thread):
 
         if rc == 0:
             # subscribe for all devices of user
-            res_1 = mqttc.subscribe('+/devices/+/up')
+            res_1 = mqttc.subscribe('v3/+/devices/+/up')
             res = mqttc.subscribe('+/devices/+/events/#')
 
             if res[0] != mqtt.MQTT_ERR_SUCCESS:
@@ -108,7 +109,7 @@ class ThreadedMQTTLogger(Thread):
         try:
             logging.debug("parsing incoming packet" + str(incoming_pkt))
 
-            parsed_pkt.parse_packet()
+            parsed_pkt.parse_packet_v3()
 
         except ValueError:
             logging.exception("Value error")
@@ -122,7 +123,11 @@ class ThreadedMQTTLogger(Thread):
             logging.exception("Wrong flight")
             return
 
-        elevation = get_altitude(longitude_deg=parsed_pkt.current_long, latitude_deg=parsed_pkt.current_lat, when=parsed_pkt.current_time)
+        logging.info("Current Position data: longitude = {0}, latitude = {1}, altitude = {2}, time = {3}".format(
+            parsed_pkt.current_long, parsed_pkt.current_lat, parsed_pkt.current_alt, parsed_pkt.current_time))
+
+        elevation = get_altitude(longitude_deg=parsed_pkt.current_long, latitude_deg=parsed_pkt.current_lat,
+                                 when=parsed_pkt.current_time)
         logging.info("Solar elevation is at {0} degrees.".format(elevation))
 
         filename = self.pm.gen_filename("prediction_at")
@@ -132,10 +137,16 @@ class ThreadedMQTTLogger(Thread):
                                  parsed_pkt.current_lat,
                                  filename)
 
-        self.pp.plot_and_save(data_dump_location/filename)
+        self.pp.plot_and_save(data_dump_location / filename)
+
 
 if __name__ == "__main__":
     APPID = "icss_lora_tracker"
     PSW = 'ttn-account-v2.vlMjFic1AU9Dr-bAI18X6kzc5lSJGbFoeLbbASramBg'
-    mqttlogger = ThreadedMQTTLogger(APPID, PSW)
+    mqttlogger = ThreadedMQTTLogger(APPID, PSW, "eu.thethings.network")
     mqttlogger.start()
+
+    APPID = "icss-lora-tracker@ttn"
+    PSW = 'NNSXS.5AHU5RFIHMCRXPQLLJIYOHPAIL6UCBUMJWMNONA.ZZL4WF6XCRS2ZPXVPKORTRVI4X3AP7VWNBLZ6QCA4RIZY3FMGQAA'
+    mqttlogger_ttnv3 = ThreadedMQTTLogger(APPID, PSW, "eu1.cloud.thethings.network")
+    mqttlogger_ttnv3.start()
