@@ -24,18 +24,38 @@ function decodeUplink(input) {
 /* ******************************************
 * bytes to number
 ********************************************/
+function readUInt8LE(bytes) {
+    return (bytes & 0xFF);
+}
+
+function readInt8LE(bytes) {
+    var ref = readUInt8LE(bytes);
+    return (ref > 0x7F) ? ref - 0x100 : ref;
+}
+
 function readUInt16LE(bytes) {
     var value = (bytes[1] << 8) + bytes[0];
-    return value & 0xffff;
+    return (value & 0xFFFF);
 }
 
 function readInt16LE(bytes) {
     var ref = readUInt16LE(bytes);
-    return ref > 0x7fff ? ref - 0x10000 : ref;
+    return (ref > 0x7FFF) ? ref - 0x10000 : ref;
 }
 
-function bytesToFloat(bytes) {
-    "use strict";
+function readUInt32LE(bytes) {
+    var value = (bytes[3] << 24) + (bytes[2] << 16) + (bytes[1] << 8) + bytes[0];
+    return (value & 0xFFFFFFFF);
+}
+
+function readInt32LE(bytes) {
+    var ref = readUInt32LE(bytes);
+    return (ref > 0x7FFFFFFF) ? ref - 0x100000000 : ref;
+}
+
+function readFloatLE(bytes) {
+    // JavaScript bitwise operators yield a 32 bits integer, not a float.
+    // Assume LSB (least significant byte first).
     var bits = bytes[3] << 24 | bytes[2] << 16 | bytes[1] << 8 | bytes[0];
     var sign = (bits >>> 31 === 0) ? 1.0 : -1.0;
     var e = bits >>> 23 & 0xff;
