@@ -1,6 +1,3 @@
-var units = ['C', 'Pa', 'kPa', 'MPa'];
-
-
 
 function decodeUplink(input) {
     "use strict";
