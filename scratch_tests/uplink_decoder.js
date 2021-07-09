@@ -13,7 +13,13 @@ function decodeUplink(input) {
                     longitude: readInt16LE(input.bytes.slice(7, 9)) * 0xffff / 1e7,
                     latitude: readInt16LE(input.bytes.slice(5, 7)) * 0xffff / 1e7,
                     altitude: readUInt16LE(input.bytes.slice(9, 11)) * 0xff / 1000,
-
+                    sats: input.bytes[3] >> 3 & 0x1F,
+                    pressure: ((input.bytes[2] >> 1) & 0x7F) * 10,
+                    reset_cnt: input.bytes[3] & 0x7,
+                    boardTemp: readInt16LE(input.bytes.slice(4, 5)),
+                    noloadVoltage: ((input.bytes[0] >> 3) & 0x1F) + 18,
+                    loadVoltage: (((input.bytes[0] << 2) & 0x1C) | ((input.bytes[1] >> 6) & 0x3)) + 18,
+                    days_of_playback: input.bytes[1] & 0x3F,
                 }
             };
         default:
